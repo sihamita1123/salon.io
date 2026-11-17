@@ -1,0 +1,1125 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aurelia Salon &amp; Spa — Where Beauty Becomes Art</title>
+<meta name="description" content="Luxury salon & spa. Hair artistry, nail studio, facials and makeup by master stylists. Book your appointment online in under a minute.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   AURELIA SALON & SPA — standalone single-file website
+   Vanilla HTML + CSS + JavaScript. No build step, no server
+   required. Bookings, messages, gift cards and newsletter
+   signups are stored in the browser's localStorage.
+   ============================================================ */
+:root{
+  --gold:#b08d57; --gold-dark:#96723f; --gold-light:#d9c193;
+  --cream:#f7f2ea; --espresso:#2b2420; --espresso-2:#332b26;
+  --ink:#2b2420; --muted:#6f6459; --border:rgba(176,141,87,.3);
+  --serif:'Playfair Display',Georgia,serif; --sans:'Jost',system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+input,textarea,select{font-family:inherit;font-size:14px}
+a{color:inherit;text-decoration:none}
+section[id]{scroll-margin-top:70px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+.serif{font-family:var(--serif)}
+.center{text-align:center}
+.upper{text-transform:uppercase;letter-spacing:.18em}
+.muted{color:var(--muted)}
+.gold-text{color:var(--gold-dark)}
+.hidden{display:none!important}
+
+/* ── Announcement bar ─────────────────────────────── */
+#announce{background:var(--gold);color:#fff;text-align:center;font-size:12.5px;letter-spacing:.04em;padding:9px 44px;position:relative}
+#announce strong{font-weight:600}
+#announce .close-a{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:#fff;font-size:16px;opacity:.85;padding:2px 6px}
+
+/* ── Navbar ───────────────────────────────────────── */
+header#nav{position:sticky;top:0;z-index:50;background:rgba(247,242,234,.95);backdrop-filter:blur(8px);box-shadow:0 1px 0 rgba(176,141,87,.25)}
+.navrow{max-width:1200px;margin:0 auto;padding:0 20px;height:68px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-badge{width:36px;height:36px;border-radius:50%;border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;color:var(--gold-dark);font-size:16px}
+.logo-name{font-family:var(--serif);font-size:19px;letter-spacing:.18em;color:var(--espresso)}
+.logo-sub{font-size:8.5px;text-transform:uppercase;letter-spacing:.4em;color:var(--gold-dark)}
+nav.links{display:flex;gap:26px}
+nav.links a{font-size:12.5px;text-transform:uppercase;letter-spacing:.18em;color:rgba(43,36,32,.8);transition:color .2s}
+nav.links a:hover{color:var(--gold)}
+.nav-cta{display:flex;align-items:center;gap:12px}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 12px;font-size:11px;font-weight:500;border:1px solid}
+.pill.open{border-color:rgba(22,120,70,.35);background:rgba(22,120,70,.08);color:#1a7a48}
+.pill.closed{border-color:rgba(190,60,60,.3);background:rgba(190,60,60,.07);color:#b23b3b}
+.nav-phone{font-size:13px;color:rgba(43,36,32,.8)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#fff;padding:12px 26px;font-size:12.5px;font-weight:600;text-transform:uppercase;letter-spacing:.15em;transition:background .2s,transform .2s}
+.btn:hover{background:var(--gold-dark)}
+.btn.dark{background:var(--espresso)}.btn.dark:hover{background:#3d332c}
+.btn.ghost{background:transparent;color:var(--gold-light);border:1px solid rgba(217,193,147,.5)}
+.btn.ghost:hover{background:var(--gold);color:#fff}
+.btn.small{padding:9px 18px;font-size:11.5px}
+#burger{display:none;font-size:22px;color:var(--espresso);padding:6px 10px}
+#mobileMenu{display:none;background:var(--cream);border-top:1px solid var(--border);padding:10px 20px 22px}
+#mobileMenu a{display:block;padding:13px 0;border-bottom:1px solid rgba(176,141,87,.18);font-size:13px;text-transform:uppercase;letter-spacing:.16em}
+
+/* ── Hero ─────────────────────────────────────────── */
+#home{min-height:92vh;display:flex;align-items:center;background:linear-gradient(115deg,#1c1613 0%,#2e2620 55%,#1c1613 100%);position:relative;overflow:hidden}
+#home:before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle at 82% 24%,rgba(217,193,147,.16),transparent 42%),radial-gradient(circle at 12% 78%,rgba(176,141,87,.12),transparent 38%)}
+#home:after{content:"";position:absolute;inset:0;opacity:.05;background-image:linear-gradient(rgba(217,193,147,.7) 1px,transparent 1px),linear-gradient(90deg,rgba(217,193,147,.7) 1px,transparent 1px);background-size:64px 64px}
+.hero-in{position:relative;z-index:2;padding:110px 0 80px;max-width:1200px;margin:0 auto;width:100%}
+.hero-eyebrow{color:var(--gold-light);font-size:11.5px;text-transform:uppercase;letter-spacing:.35em;display:flex;align-items:center;gap:12px}
+.hero-eyebrow:before{content:"";width:40px;height:1px;background:rgba(217,193,147,.7)}
+#home h1{font-family:var(--serif);color:#fff;font-size:clamp(42px,7vw,76px);line-height:1.08;margin:22px 0 24px;font-weight:400}
+#home h1 em{color:var(--gold-light);font-style:italic}
+.hero-copy{color:rgba(255,255,255,.78);max-width:540px;font-size:16.5px}
+.hero-actions{margin-top:34px;display:flex;gap:14px;flex-wrap:wrap}
+.hero-rating{margin-top:18px;color:rgba(255,255,255,.65);font-size:13.5px;display:flex;gap:10px;align-items:center}
+.stars{color:var(--gold-light);letter-spacing:2px}
+.hero-stats{margin-top:56px;display:grid;grid-template-columns:repeat(4,1fr);gap:22px;max-width:760px;border-top:1px solid rgba(255,255,255,.15);padding-top:26px}
+.hero-stats b{display:block;font-family:var(--serif);font-size:30px;color:var(--gold-light);font-weight:400}
+.hero-stats span{font-size:10.5px;text-transform:uppercase;letter-spacing:.2em;color:rgba(255,255,255,.55)}
+
+/* ── Section headings ─────────────────────────────── */
+.sec{padding:92px 0}
+.sec-dark{background:var(--espresso)}
+.sec-alt{background:#fff}
+.eyebrow{color:var(--gold-dark);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.3em}
+.sec-dark .eyebrow{color:var(--gold)}
+.sec h2{font-family:var(--serif);font-size:clamp(30px,4vw,44px);font-weight:400;margin:12px 0 0;line-height:1.15}
+.sec-dark h2{color:var(--cream)}
+.sec-sub{max-width:640px;margin:16px auto 0;color:var(--muted);font-size:15px}
+.sec-dark .sec-sub{color:rgba(247,242,234,.65)}
+.rule{width:64px;height:1px;background:rgba(176,141,87,.6);margin:26px auto 0}
+
+/* ── Services ─────────────────────────────────────── */
+.tabs{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:36px}
+.tab{border:1px solid var(--border);border-radius:999px;padding:10px 24px;font-size:12.5px;text-transform:uppercase;letter-spacing:.14em;color:rgba(43,36,32,.7);transition:all .2s}
+.tab.active,.tab:hover{background:var(--gold);border-color:var(--gold);color:#fff}
+.tab-blurb{text-align:center;color:var(--muted);font-size:13.5px;margin-top:14px}
+.svc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;margin-top:40px}
+.svc{background:#fff;border:1px solid rgba(176,141,87,.22);padding:24px;position:relative;transition:all .25s;display:flex;flex-direction:column}
+.svc:hover{transform:translateY(-4px);border-color:rgba(176,141,87,.6);box-shadow:0 18px 40px -18px rgba(176,141,87,.45)}
+.svc .pop{position:absolute;top:-11px;right:18px;background:var(--gold);color:#fff;font-size:9.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;padding:4px 12px}
+.svc h3{font-family:var(--serif);font-size:20px;font-weight:400}
+.svc p{font-size:13.5px;color:var(--muted);flex:1;margin-top:10px}
+.svc-foot{display:flex;align-items:center;justify-content:space-between;border-top:1px dashed rgba(176,141,87,.35);margin-top:18px;padding-top:16px}
+.price{font-family:var(--serif);font-size:24px;color:var(--gold-dark)}
+.dur{font-size:12px;color:var(--muted)}
+.svc-book{font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:var(--gold-dark);padding:6px 10px}
+.svc-book:hover{background:rgba(176,141,87,.1)}
+
+/* ── About strip ──────────────────────────────────── */
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:26px;margin-top:48px}
+.feat{background:var(--cream);border:1px solid var(--border);padding:28px}
+.feat .fi{width:44px;height:44px;border-radius:50%;border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;color:var(--gold-dark);font-size:18px;margin-bottom:16px}
+.feat h3{font-size:15px;font-weight:600;margin-bottom:8px}
+.feat p{font-size:13.5px;color:var(--muted)}
+
+/* ── Team ─────────────────────────────────────────── */
+.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:22px;margin-top:48px}
+.member{background:#fff;border:1px solid rgba(176,141,87,.22);text-align:center;padding:30px 22px;transition:all .25s}
+.member:hover{transform:translateY(-4px);box-shadow:0 18px 40px -18px rgba(176,141,87,.4)}
+.avatar{width:84px;height:84px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:28px;color:#fff}
+.member h3{font-family:var(--serif);font-size:19px;font-weight:400;margin-top:16px}
+.member .role{font-size:10.5px;text-transform:uppercase;letter-spacing:.18em;color:var(--gold-dark);margin-top:6px}
+.member .quote{font-size:12.5px;font-style:italic;color:var(--muted);margin-top:12px}
+.member .yrs{display:inline-block;margin-top:14px;font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-dark);background:rgba(176,141,87,.12);padding:4px 12px;border-radius:999px}
+
+/* ── Packages / Gift cards ────────────────────────── */
+.pkg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:48px}
+.pkg{background:#fff;border:1px solid rgba(176,141,87,.25);padding:30px;display:flex;flex-direction:column;transition:transform .25s}
+.pkg:hover{transform:translateY(-4px)}
+.pkg.featured{background:var(--espresso);color:var(--cream);border:2px solid var(--gold);position:relative}
+.pkg .tag{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--gold);color:#fff;font-size:9.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;padding:4px 14px}
+.pkg h3{font-family:var(--serif);font-size:22px;font-weight:400}
+.pkg.featured h3{color:var(--cream)}
+.pkg p{font-size:13.5px;color:var(--muted);margin-top:10px;flex:1}
+.pkg.featured p{color:rgba(247,242,234,.72)}
+.pkg ul{list-style:none;margin:18px 0;border-top:1px dashed rgba(176,141,87,.35);padding-top:16px}
+.pkg.featured ul{border-color:rgba(255,255,255,.15)}
+.pkg li{font-size:13px;padding:5px 0}
+.pkg li:before{content:"✓";color:var(--gold-dark);margin-right:9px;font-weight:600}
+.pkg.featured li:before{color:var(--gold-light)}
+.pkg .pval{font-family:var(--serif);font-size:30px;color:var(--gold-dark)}
+.pkg.featured .pval{color:var(--gold-light)}
+.pkg .was{color:var(--muted);text-decoration:line-through;font-size:14px;margin-left:8px}
+.pkg.featured .was{color:rgba(255,255,255,.4)}
+.pkg .btn{margin-top:18px;width:100%}
+.pkg:not(.featured) .btn{background:transparent;border:1px solid var(--espresso);color:var(--espresso)}
+.pkg:not(.featured) .btn:hover{background:var(--espresso);color:#fff}
+
+.gc-panel{max-width:960px;margin:48px auto 0;display:grid;grid-template-columns:1.2fr 1fr;border:1px solid var(--border);overflow:hidden}
+.gc-form{background:var(--cream);padding:36px}
+.gc-visual{background:var(--espresso);display:flex;align-items:center;justify-content:center;padding:40px;position:relative}
+.gc-visual:before{content:"";position:absolute;inset:0;opacity:.07;background-image:radial-gradient(circle at 30% 30%,var(--gold-light) 1.5px,transparent 1.5px);background-size:26px 26px}
+.gc-card{width:100%;max-width:270px;transform:rotate(-4deg);border:1px solid rgba(176,141,87,.5);background:linear-gradient(135deg,#3d342e,#2b2420);padding:30px;text-align:center;box-shadow:0 30px 60px -25px rgba(0,0,0,.8);color:var(--cream)}
+.gc-card .amt{font-family:var(--serif);font-size:46px;margin:14px 0}
+.gc-card .note{font-size:11px;font-style:italic;color:rgba(247,242,234,.6)}
+.gc-card .fake-code{font-family:monospace;letter-spacing:.3em;color:var(--gold-light);font-size:12px;margin-top:18px}
+.amt-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.amt-btn{border:1px solid var(--border);background:#fff;padding:18px;font-family:var(--serif);font-size:22px;transition:all .2s}
+.amt-btn.active{border-color:var(--gold);background:rgba(176,141,87,.1);color:var(--gold-dark)}
+.field{margin-top:16px}
+.field label{display:block;font-size:12.5px;font-weight:500;margin-bottom:7px}
+.field input,.field textarea,.field select{width:100%;border:1px solid rgba(176,141,87,.35);background:#fff;padding:11px 14px;color:var(--ink);outline:none;transition:border .2s}
+.field input:focus,.field textarea:focus{border-color:var(--gold)}
+.field .err{color:#b23b3b;font-size:12px;margin-top:5px}
+.gc-success{text-align:center;color:var(--cream);position:relative}
+.gc-success .code{font-family:monospace;font-size:19px;letter-spacing:.2em;background:#3d342e;border:1px solid rgba(176,141,87,.4);padding:12px 18px;margin-top:16px;display:inline-block;color:#fff}
+
+/* ── Gallery ──────────────────────────────────────── */
+.gal{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:48px}
+.gal-item{aspect-ratio:4/5;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.gal-item:hover .gal-label{opacity:1;transform:translateY(0)}
+.gal-label{position:absolute;bottom:16px;left:0;right:0;text-align:center;color:#fff;font-size:12.5px;font-weight:500;text-transform:uppercase;letter-spacing:.16em;opacity:0;transform:translateY(6px);transition:all .3s;text-shadow:0 1px 8px rgba(0,0,0,.5)}
+.gal-item .glyph{font-family:var(--serif);font-size:44px;color:rgba(255,255,255,.5)}
+#lightbox{position:fixed;inset:0;background:rgba(20,16,13,.94);z-index:80;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px}
+#lightbox .frame{width:min(520px,86vw);aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:60px;color:rgba(255,255,255,.55)}
+#lightbox .cap{color:var(--gold-light);font-size:12.5px;text-transform:uppercase;letter-spacing:.2em}
+.lb-btn{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.85);font-size:20px}
+.lb-btn:hover{background:rgba(255,255,255,.1)}
+#lbPrev{left:18px}#lbNext{right:18px}
+#lbClose{position:absolute;top:18px;right:18px;width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.25);color:#fff;font-size:18px}
+
+/* ── Testimonials ─────────────────────────────────── */
+.tst{max-width:760px;margin:0 auto;text-align:center}
+.tst blockquote{animation:fadeUp .4s ease}
+.tst .qmark{font-family:var(--serif);font-size:52px;color:rgba(176,141,87,.6);line-height:1}
+.tst p{font-family:var(--serif);font-style:italic;font-size:clamp(18px,2.6vw,24px);color:var(--cream);margin-top:18px}
+.tst .who{margin-top:22px;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.2em;color:var(--gold-light)}
+.tst .svc{font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:rgba(255,255,255,.45);margin-top:4px}
+.tst-nav{display:flex;align-items:center;justify-content:center;gap:20px;margin-top:34px}
+.tst-nav button.arr{width:44px;height:44px;border-radius:50%;border:1px solid rgba(176,141,87,.4);color:var(--gold-light);font-size:18px}
+.tst-nav button.arr:hover{background:var(--gold);color:#fff}
+.dots{display:flex;gap:8px}
+.dot{width:7px;height:7px;border-radius:999px;background:rgba(255,255,255,.25);transition:all .25s}
+.dot.active{width:26px;background:var(--gold)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* ── Booking wizard ───────────────────────────────── */
+#booking{background:var(--espresso);position:relative;overflow:hidden}
+#booking:before{content:"";position:absolute;inset:0;opacity:.04;background-image:radial-gradient(circle at 20% 30%,var(--gold-light) 1px,transparent 1px),radial-gradient(circle at 80% 70%,var(--gold-light) 1px,transparent 1px);background-size:90px 90px}
+.wizard{position:relative;max-width:980px;margin:52px auto 0;background:var(--espresso-2);border:1px solid rgba(255,255,255,.1);color:var(--cream)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid rgba(255,255,255,.1)}
+.step{display:flex;align-items:center;justify-content:center;gap:10px;padding:18px 8px;font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:rgba(255,255,255,.4);border:none;width:100%}
+.step .n{width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:12.5px}
+.step.current{color:var(--gold-light)}
+.step.current .n{border-color:var(--gold-light);background:rgba(176,141,87,.15)}
+.step.done{color:rgba(247,242,234,.8);cursor:pointer}
+.step.done .n{background:var(--gold);border-color:var(--gold);color:#fff}
+.wiz-body{display:grid;grid-template-columns:1fr 280px;gap:36px;padding:36px}
+.wiz-main h3{font-family:var(--serif);font-size:22px;font-weight:400;color:var(--cream)}
+.wiz-hint{font-size:13px;color:rgba(247,242,234,.6);margin-top:6px}
+.chiprow{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.chip{border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:9px 18px;font-size:11.5px;text-transform:uppercase;letter-spacing:.12em;color:rgba(247,242,234,.7);transition:all .2s}
+.chip.active,.chip:hover{background:var(--gold);border-color:var(--gold);color:#fff}
+.picklist{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px;max-height:380px;overflow-y:auto}
+.pick{border:1px solid rgba(255,255,255,.12);padding:16px;text-align:left;color:var(--cream);transition:all .2s;display:block;width:100%}
+.pick:hover{border-color:rgba(176,141,87,.55)}
+.pick.sel{border-color:var(--gold);background:rgba(176,141,87,.1)}
+.pick .t{font-size:14px;font-weight:500;display:flex;justify-content:space-between;gap:10px}
+.pick .t b{color:var(--gold-light);font-family:var(--serif);font-weight:400;font-size:17px}
+.pick .d{font-size:12px;color:rgba(247,242,234,.55);margin-top:6px}
+.person{display:flex;gap:12px;align-items:center}
+.person .pa{width:44px;height:44px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--serif);color:#fff;font-size:16px}
+.times{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px;max-height:280px;overflow-y:auto}
+.slot{border:1px solid rgba(255,255,255,.15);padding:10px;font-size:12.5px;color:rgba(247,242,234,.8);text-align:center}
+.slot.sel{background:var(--gold);border-color:var(--gold);color:#fff}
+.slot:disabled{opacity:.28;text-decoration:line-through;cursor:not-allowed}
+.slot:hover:not(:disabled):not(.sel){border-color:rgba(176,141,87,.6)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:18px}
+.cal .dow{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:rgba(247,242,234,.45);text-align:center;padding:6px 0}
+.day{aspect-ratio:1;border:1px solid transparent;color:var(--cream);font-size:13px;display:flex;align-items:center;justify-content:center}
+.day:disabled{opacity:.22;cursor:not-allowed}
+.day.sel{background:var(--gold);color:#fff}
+.day:not(:disabled):hover{border-color:rgba(176,141,87,.5)}
+.day.today{border-color:rgba(176,141,87,.4)}
+.cal-head{display:flex;justify-content:space-between;align-items:center;margin-top:18px}
+.cal-head button{color:var(--gold-light);font-size:16px;padding:4px 10px}
+.cal-head .mon{font-family:var(--serif);font-size:17px;color:var(--cream)}
+.wiz-form{display:grid;gap:16px;margin-top:20px}
+.wiz-form .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.wiz-form label{font-size:12.5px;color:rgba(247,242,234,.8);display:block;margin-bottom:7px}
+.wiz-form input,.wiz-form textarea{width:100%;background:#3d342e;border:1px solid rgba(255,255,255,.15);color:var(--cream);padding:12px 14px;outline:none}
+.wiz-form input:focus,.wiz-form textarea:focus{border-color:var(--gold)}
+.wiz-form .err{color:#ff9d9d;font-size:12px;margin-top:5px}
+.wiz-nav{display:flex;justify-content:space-between;border-top:1px solid rgba(255,255,255,.1);padding:20px 36px 30px}
+.wiz-back{color:rgba(247,242,234,.7);font-size:12px;text-transform:uppercase;letter-spacing:.14em;padding:10px 16px}
+.wiz-back:hover{color:var(--cream)}
+.summary{background:#3d342e;border:1px solid rgba(176,141,87,.25);padding:24px;height:fit-content}
+.summary .st{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.25em;color:var(--gold-light)}
+.summary dl{margin-top:18px}
+.summary dt{font-size:10.5px;text-transform:uppercase;letter-spacing:.14em;color:rgba(247,242,234,.45)}
+.summary dd{font-size:14px;color:var(--cream);margin:5px 0 14px}
+.summary .callout{border-top:1px dashed rgba(176,141,87,.3);padding-top:14px;font-size:11.5px;color:rgba(247,242,234,.6);line-height:1.6}
+.confirm{padding:60px 30px;text-align:center}
+.confirm .ok{width:64px;height:64px;border-radius:50%;background:rgba(176,141,87,.15);color:var(--gold-light);font-size:30px;display:flex;align-items:center;justify-content:center;margin:0 auto}
+.confirm h3{font-family:var(--serif);font-size:30px;font-weight:400;color:var(--cream);margin-top:22px}
+.confirm .ref{font-family:monospace;font-size:24px;letter-spacing:.2em;background:#3d342e;border:1px solid rgba(176,141,87,.4);padding:14px 22px;display:inline-block;margin-top:22px;color:#fff}
+.confirm dl{max-width:420px;margin:26px auto 0;text-align:left;border-top:1px solid rgba(255,255,255,.1);padding-top:20px}
+.confirm .row{display:flex;justify-content:space-between;gap:16px;font-size:13.5px;padding:6px 0}
+.confirm .row dt{color:rgba(247,242,234,.6)}
+.confirm .row dd{color:var(--cream);font-weight:500;text-align:right}
+
+/* ── FAQ ──────────────────────────────────────────── */
+.faq{max-width:740px;margin:48px auto 0}
+.faq-item{border-bottom:1px solid rgba(176,141,87,.25)}
+.faq-q{width:100%;text-align:left;padding:20px 4px;font-size:15px;font-weight:500;display:flex;justify-content:space-between;gap:16px;align-items:center}
+.faq-q:after{content:"+";color:var(--gold-dark);font-size:19px;transition:transform .25s}
+.faq-item.open .faq-q:after{transform:rotate(45deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease;font-size:14px;color:var(--muted)}
+.faq-item.open .faq-a{max-height:260px}
+.faq-a p{padding:0 4px 20px}
+
+/* ── Contact ──────────────────────────────────────── */
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:48px}
+.ccard{background:var(--cream);border:1px solid var(--border);padding:26px}
+.ccard h3{font-size:12.5px;text-transform:uppercase;letter-spacing:.16em;margin:12px 0 10px}
+.ccard p,.ccard a{font-size:14px;color:var(--muted)}
+.ccard a:hover{color:var(--gold-dark)}
+.ccard .ico{color:var(--gold-dark);font-size:18px}
+.hours{margin-top:14px}
+.hours .row{display:flex;justify-content:space-between;font-size:13.5px;padding:8px 0;border-bottom:1px solid rgba(176,141,87,.15)}
+.hours .row.today{font-weight:600}
+.hours .row.today dd{color:var(--gold-dark)}
+.badge-today{background:var(--gold);color:#fff;font-size:8.5px;padding:2px 7px;text-transform:uppercase;letter-spacing:.1em;margin-left:8px;border-radius:3px;vertical-align:2px}
+.contact-wide{grid-column:1/-1;background:var(--cream);border:1px solid var(--border);padding:34px;display:grid;grid-template-columns:1fr 1.3fr;gap:34px}
+.map-panel{background:var(--espresso);color:var(--cream);padding:30px;position:relative;overflow:hidden}
+.map-panel:before{content:"";position:absolute;inset:0;opacity:.1;background-image:linear-gradient(rgba(217,193,147,.6) 1px,transparent 1px),linear-gradient(90deg,rgba(217,193,147,.6) 1px,transparent 1px);background-size:44px 44px}
+
+/* ── Footer ───────────────────────────────────────── */
+footer{background:var(--espresso);color:rgba(247,242,234,.6);border-top:1px solid rgba(255,255,255,.1)}
+.foot-grid{max-width:1200px;margin:0 auto;padding:56px 20px 0;display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px}
+footer h4{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.25em;color:var(--gold-light);margin-bottom:16px}
+footer a:hover{color:var(--gold-light)}
+footer li{list-style:none;padding:5px 0;font-size:13.5px}
+.foot-brand p{font-size:13.5px;max-width:340px;margin-top:14px}
+.socials{display:flex;gap:10px;margin-top:20px}
+.socials a{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:13px}
+.socials a:hover{background:var(--gold);border-color:var(--gold);color:#fff}
+.newsletter{margin-top:26px}
+.newsletter .row{display:flex;gap:8px;margin-top:12px}
+.newsletter input{flex:1;background:#3d342e;border:1px solid rgba(255,255,255,.15);color:var(--cream);padding:11px 14px;outline:none}
+.newsletter input:focus{border-color:var(--gold)}
+.foot-bottom{max-width:1200px;margin:44px auto 0;padding:20px;border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-between;gap:12px;font-size:12px;flex-wrap:wrap}
+.linkish{color:var(--gold-light);text-decoration:underline;text-underline-offset:4px;cursor:pointer;background:none;border:none;font-size:12px}
+
+/* ── Toast ────────────────────────────────────────── */
+#toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-120%);background:var(--espresso);color:var(--cream);padding:13px 22px;font-size:13.5px;border-left:3px solid var(--gold);box-shadow:0 16px 40px -12px rgba(0,0,0,.5);z-index:100;transition:transform .35s;max-width:90vw}
+#toast.show{transform:translateX(-50%) translateY(0)}
+#toast.err{border-left-color:#c0392b}
+
+/* ── Floating buttons ─────────────────────────────── */
+#toTop{position:fixed;bottom:20px;left:20px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(176,141,87,.5);background:rgba(247,242,234,.92);color:var(--gold-dark);font-size:18px;opacity:0;pointer-events:none;transition:all .3s;z-index:40}
+#toTop.show{opacity:1;pointer-events:auto}
+#toTop:hover{background:var(--gold);color:#fff}
+#mobileBook{display:none;position:fixed;bottom:20px;right:20px;background:var(--gold);color:#fff;border-radius:999px;padding:16px 24px;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.14em;box-shadow:0 12px 30px -8px rgba(176,141,87,.7);z-index:40}
+
+/* ── Responsive ───────────────────────────────────── */
+@media(max-width:900px){
+  nav.links,.nav-cta .nav-phone,.nav-cta .pill{display:none}
+  #burger{display:block}
+  #mobileMenu.open{display:block}
+  .hero-stats{grid-template-columns:repeat(2,1fr)}
+  .wiz-body{grid-template-columns:1fr;padding:24px}
+  .summary{order:-1}
+  .gc-panel{grid-template-columns:1fr}
+  .gal{grid-template-columns:repeat(2,1fr)}
+  .contact-wide{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  #mobileBook{display:block}
+  .picklist{grid-template-columns:1fr}
+  .times{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:560px){
+  .foot-grid{grid-template-columns:1fr}
+  .wiz-nav{padding:16px 20px 24px}
+  .contact-wide{padding:24px}
+  .sec{padding:64px 0}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ ANNOUNCEMENT ══════════════ -->
+<div id="announce">✨ Winter Offer — <strong>20% off all color services</strong> this month · Mention “WINTER20” when you visit <button class="close-a" onclick="this.parentElement.remove()" aria-label="Dismiss">✕</button></div>
+
+<!-- ══════════════ NAVBAR ══════════════ -->
+<header id="nav">
+  <div class="navrow">
+    <a href="#home" class="logo">
+      <span class="logo-badge">✦</span>
+      <span><span class="logo-name">AURELIA</span><br><span class="logo-sub">Salon &amp; Spa</span></span>
+    </a>
+    <nav class="links" aria-label="Main">
+      <a href="#services">Services</a><a href="#team">Team</a><a href="#gallery">Gallery</a><a href="#reviews">Reviews</a><a href="#contact">Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <span id="openPill" class="pill closed">…</span>
+      <a class="nav-phone" href="tel:+18254195570">📞 +1 (825) 419-5570</a>
+      <a class="btn small" href="#booking">Book Now</a>
+      <button id="burger" aria-label="Menu" onclick="document.getElementById('mobileMenu').classList.toggle('open')">☰</button>
+    </div>
+  </div>
+  <div id="mobileMenu">
+    <a href="#services">Services</a><a href="#team">Team</a><a href="#gallery">Gallery</a><a href="#reviews">Reviews</a><a href="#contact">Contact</a>
+    <a href="tel:+18254195570">📞 +1 (825) 419-5570</a>
+    <a href="mailto:sihaamcabdiraxmaan628@gmail.com" style="text-transform:none;letter-spacing:0">✉️ sihaamcabdiraxmaan628@gmail.com</a>
+    <a href="#booking" onclick="this.parentElement.classList.remove('open')" style="background:var(--gold);color:#fff;text-align:center;margin-top:16px;border:none">Book an Appointment</a>
+  </div>
+</header>
+
+<!-- ══════════════ HERO ══════════════ -->
+<section id="home">
+  <div class="hero-in">
+    <p class="hero-eyebrow">Beverly Hills · Est. 2012</p>
+    <h1>Where beauty<br>becomes <em>art</em></h1>
+    <p class="hero-copy">From lived-in balayage to restorative facials and couture nails — Aurelia brings twelve award-winning stylists, salon-grade products and a calm, unhurried atmosphere to every visit.</p>
+    <div class="hero-actions">
+      <a class="btn" href="#booking">🗓 Book Appointment</a>
+      <a class="btn ghost" href="#services">View Services</a>
+    </div>
+    <p class="hero-rating"><span class="stars">★★★★★</span> Rated 4.9 by 2,300+ clients</p>
+    <div class="hero-stats">
+      <div><b>13+</b><span>Years of craft</span></div>
+      <div><b>25k</b><span>Happy clients</span></div>
+      <div><b>12</b><span>Master stylists</span></div>
+      <div><b>4.9</b><span>Google rating</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ SERVICES ══════════════ -->
+<section id="services" class="sec">
+  <div class="wrap center">
+    <p class="eyebrow">Our Services</p>
+    <h2>Crafted around you</h2>
+    <p class="sec-sub">Every appointment begins with a personal consultation. Choose from signature services across hair, nails, skin and makeup — each performed with salon-grade, cruelty-free products.</p>
+    <div class="rule"></div>
+    <div class="tabs" id="svcTabs"></div>
+    <p class="tab-blurb" id="svcBlurb"></p>
+    <div class="svc-grid" id="svcGrid"></div>
+    <p style="margin-top:40px;font-size:13.5px" class="muted">Not sure what you need? <a href="#booking" class="gold-text" style="text-decoration:underline;text-underline-offset:4px">Book a free 15-minute consultation</a> and we’ll build the perfect plan together.</p>
+  </div>
+</section>
+
+<!-- ══════════════ WHY US ══════════════ -->
+<section class="sec sec-alt" id="about">
+  <div class="wrap center">
+    <p class="eyebrow">The Aurelia Experience</p>
+    <h2>A salon built on calm, craft and attention</h2>
+    <p class="sec-sub">Aurelia opened in 2012 with one belief: a salon visit should feel like leaving the world at the door. Thirteen years later that belief has grown into the city’s most-loved salon.</p>
+    <div class="rule"></div>
+    <div class="feat-grid" style="text-align:left">
+      <div class="feat"><div class="fi">💎</div><h3>Master-level stylists</h3><p>Every team member trains 100+ hours a year with educators from Paris, Milan and Tokyo.</p></div>
+      <div class="feat"><div class="fi">🌿</div><h3>Clean, salon-grade products</h3><p>Cruelty-free lines chosen for real results — gentle on you, ruthless on frizz.</p></div>
+      <div class="feat"><div class="fi">🤝</div><h3>Unhurried, personal care</h3><p>We double-book no one. Your chair, your stylist, your time — with zero rush.</p></div>
+      <div class="feat"><div class="fi">✨</div><h3>Detail-obsessed finishing</h3><p>From the welcome tea to the final mirror reveal, every step is considered.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ TEAM ══════════════ -->
+<section id="team" class="sec">
+  <div class="wrap center">
+    <p class="eyebrow">Meet The Team</p>
+    <h2>Artists behind the chair</h2>
+    <p class="sec-sub">Hand-picked, award-trained and endlessly curious — choose your specialist or let us match you with the perfect fit when you book.</p>
+    <div class="rule"></div>
+    <div class="team-grid" id="teamGrid"></div>
+  </div>
+</section>
+
+<!-- ══════════════ PACKAGES ══════════════ -->
+<section id="packages" class="sec sec-alt">
+  <div class="wrap center">
+    <p class="eyebrow">Signature Packages</p>
+    <h2>An afternoon to yourself</h2>
+    <p class="sec-sub">Curated rituals that pair our most-loved treatments — with savings on every combination.</p>
+    <div class="rule"></div>
+    <div class="pkg-grid" id="pkgGrid"></div>
+  </div>
+</section>
+
+<!-- ══════════════ GIFT CARDS ══════════════ -->
+<section id="gift" class="sec">
+  <div class="wrap center">
+    <p class="eyebrow">Give Beautifully</p>
+    <h2>Aurelia gift cards</h2>
+    <p class="sec-sub">The gift of a few unhurried hours. Digital gift cards are issued instantly and never expire — redeemable on every service and package.</p>
+    <div class="rule"></div>
+    <div class="gc-panel" style="text-align:left">
+      <div class="gc-form">
+        <h3 class="serif" style="font-size:24px">Choose an amount</h3>
+        <div class="amt-btns" style="margin-top:20px">
+          <button class="amt-btn" data-amt="50">$50</button>
+          <button class="amt-btn active" data-amt="100">$100</button>
+          <button class="amt-btn" data-amt="200">$200</button>
+        </div>
+        <div class="field"><label for="gcCustom">Or a custom amount ($25 – $1,000)</label><input id="gcCustom" type="number" min="25" max="1000" placeholder="e.g. 150"></div>
+        <div class="field"><label for="gcName">Your name</label><input id="gcName" placeholder="Who is gifting?"></div>
+        <div class="field"><label for="gcEmail">Your email</label><input id="gcEmail" type="email" placeholder="Where to send it"></div>
+        <p class="err hidden" id="gcErr"></p>
+        <button class="btn dark" style="width:100%;margin-top:22px" id="gcBuy">🎁 Issue Gift Card — <span id="gcAmt">$100</span></button>
+        <p style="font-size:12px;color:var(--muted);margin-top:12px">Cards are issued digitally and can be redeemed by quoting the code at reception or when booking.</p>
+      </div>
+      <div class="gc-visual" id="gcVisual">
+        <div class="gc-card">
+          <div style="font-size:26px">🎁</div>
+          <p style="font-size:9.5px;letter-spacing:.35em;text-transform:uppercase;color:var(--gold-light);margin-top:10px">Aurelia Salon &amp; Spa</p>
+          <p class="amt" id="gcCardAmt">$100</p>
+          <p class="note">A few unhurried hours, beautifully wrapped.</p>
+          <div style="height:1px;width:90px;background:rgba(176,141,87,.5);margin:16px auto"></div>
+          <p class="fake-code" id="gcCardCode">AUR-G-••••••••</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ GALLERY ══════════════ -->
+<section id="gallery" class="sec sec-alt">
+  <div class="wrap center">
+    <p class="eyebrow">Our Work</p>
+    <h2>Recent from the floor</h2>
+    <p class="sec-sub">A glimpse of the transformations, artistry and quiet moments happening at Aurelia every day.</p>
+    <div class="rule"></div>
+    <div class="gal" id="galGrid"></div>
+    <p style="margin-top:36px;font-size:13.5px" class="muted">Follow <span class="gold-text" style="font-weight:500">@aureliasalon</span> for daily transformations and last-minute opening alerts.</p>
+  </div>
+</section>
+
+<!-- ══════════════ REVIEWS ══════════════ -->
+<section id="reviews" class="sec sec-dark">
+  <div class="wrap center">
+    <p class="eyebrow">Client Stories</p>
+    <h2>Loved by 25,000 guests</h2>
+    <p class="sec-sub">Real words from real visits — the reason 8 out of 10 first-timers become regulars.</p>
+    <div class="rule"></div>
+    <div class="tst" id="tstBox" style="margin-top:44px"></div>
+    <div class="tst-nav">
+      <button class="arr" onclick="tstMove(-1)" aria-label="Previous review">‹</button>
+      <div class="dots" id="tstDots"></div>
+      <button class="arr" onclick="tstMove(1)" aria-label="Next review">›</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ BOOKING ══════════════ -->
+<section id="booking" class="sec">
+  <div class="wrap center">
+    <p class="eyebrow">Reserve Your Visit</p>
+    <h2 style="color:var(--cream)">Book your appointment</h2>
+    <p class="sec-sub">Four quick steps — choose a service, pick your artist, find a time that suits you, and we’ll handle the rest. No account needed.</p>
+    <div class="rule"></div>
+    <div class="wizard" style="text-align:left">
+      <div class="steps" id="stepBar"></div>
+      <div id="wizContent">
+        <div class="wiz-body">
+          <div class="wiz-main" id="wizMain"></div>
+          <aside class="summary">
+            <p class="st">Your appointment</p>
+            <dl>
+              <dt>Service</dt><dd id="sumSvc" style="color:rgba(247,242,234,.4)">Not selected</dd>
+              <dt>Stylist</dt><dd id="sumSty">No preference</dd>
+              <dt>When</dt><dd id="sumWhen" style="color:rgba(247,242,234,.4)">Not selected</dd>
+            </dl>
+            <p class="callout">📞 Prefer to talk? Call <strong style="color:var(--gold-light)">+1 (825) 419-5570</strong> and we’ll book you in personally.</p>
+          </aside>
+        </div>
+        <div class="wiz-nav" id="wizNav"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ FAQ ══════════════ -->
+<section id="faq" class="sec sec-alt">
+  <div class="wrap center">
+    <p class="eyebrow">Good To Know</p>
+    <h2>Frequently asked questions</h2>
+    <div class="rule"></div>
+    <div class="faq" id="faqBox" style="text-align:left"></div>
+  </div>
+</section>
+
+<!-- ══════════════ CONTACT ══════════════ -->
+<section id="contact" class="sec">
+  <div class="wrap center">
+    <p class="eyebrow">Visit Us</p>
+    <h2>Find your way to calm</h2>
+    <p class="sec-sub">Two minutes off Wilshire Boulevard — with two hours of complimentary parking directly beneath the salon.</p>
+    <div class="rule"></div>
+    <div class="contact-grid" style="text-align:left">
+      <div class="ccard">
+        <span class="ico">📍</span><h3>Address</h3>
+        <p>128 Rosewood Avenue, Beverly Hills, CA 90210</p>
+        <p style="margin-top:10px;font-size:12.5px">🚗 Free 2-hour parking · Rosewood garage</p>
+      </div>
+      <div class="ccard">
+        <span class="ico">📞</span><h3>Get in touch</h3>
+        <p><a href="tel:+18254195570">+1 (825) 419-5570</a><br><a href="mailto:sihaamcabdiraxmaan628@gmail.com" style="word-break:break-all">sihaamcabdiraxmaan628@gmail.com</a></p>
+        <p style="margin-top:10px;font-size:12.5px">We reply within one business hour.</p>
+      </div>
+      <div class="ccard">
+        <span class="ico">🕐</span><h3>Opening hours <span id="todayBadge" style="display:inline-block;margin-left:6px;font-size:10px;color:var(--gold-dark)"></span></h3>
+        <div class="hours" id="hoursList"></div>
+      </div>
+      <div class="map-panel">
+        <div style="position:relative">
+          <div style="font-size:24px">📍</div>
+          <h3 class="serif" style="font-size:22px;font-weight:400;margin-top:10px">Aurelia Salon &amp; Spa</h3>
+          <p style="font-size:13.5px;color:rgba(247,242,234,.7);margin-top:8px">128 Rosewood Avenue, Beverly Hills, CA 90210</p>
+          <ul style="margin-top:14px;font-size:13px;color:rgba(247,242,234,.7);padding-left:0">
+            <li style="padding:3px 0;list-style:none">· 5 min walk from Wilshire/Rodeo station</li>
+            <li style="padding:3px 0;list-style:none">· Validated parking at Rosewood garage</li>
+            <li style="padding:3px 0;list-style:none">· Step-free entrance and accessible washrooms</li>
+          </ul>
+          <a class="btn ghost" style="margin-top:20px;width:100%" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=128+Rosewood+Avenue+Beverly+Hills+CA">Get Directions</a>
+        </div>
+      </div>
+      <div class="contact-wide">
+        <div>
+          <h3 class="serif" style="font-size:24px;font-weight:400">Send us a message</h3>
+          <p style="font-size:13.5px;color:var(--muted);margin-top:10px">Questions about a service, planning a bridal party, or booking a group? Write to us and a real member of the team will get back to you — usually within the hour during opening times.</p>
+        </div>
+        <div>
+          <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div class="field" style="margin-top:0"><label for="cfName">Name *</label><input id="cfName" placeholder="Your name"></div>
+            <div class="field" style="margin-top:0"><label for="cfEmail">Email *</label><input id="cfEmail" type="email" placeholder="you@example.com"></div>
+          </div>
+          <div class="field"><label for="cfSubject">Subject</label><input id="cfSubject" placeholder="e.g. Bridal party of 5"></div>
+          <div class="field"><label for="cfMsg">Message *</label><textarea id="cfMsg" rows="4" placeholder="How can we help?"></textarea></div>
+          <p class="err hidden" id="cfErr"></p>
+          <button class="btn dark" style="margin-top:18px" id="cfSend">✉ Send Message</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<footer>
+  <div class="foot-grid">
+    <div class="foot-brand">
+      <p class="serif" style="font-size:22px;letter-spacing:.18em;color:var(--cream)">AURELIA</p>
+      <p style="font-size:9px;text-transform:uppercase;letter-spacing:.4em;color:var(--gold-light)">Salon &amp; Spa</p>
+      <p>Where beauty becomes art. Beverly Hills’ calmest luxury salon since 2012 — hair artistry, nails, skin and makeup under one warm roof.</p>
+      <div class="socials"><a href="#home" aria-label="Instagram">📷</a><a href="#home" aria-label="Facebook">f</a><a href="#home" aria-label="Twitter">𝕏</a></div>
+      <div class="newsletter">
+        <h4>Newsletter</h4>
+        <p style="font-size:12px">Seasonal offers and last-minute openings — no spam, ever.</p>
+        <div class="row">
+          <input type="email" id="nlEmail" placeholder="Your email" aria-label="Email for newsletter">
+          <button class="btn small" id="nlBtn">➤</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h4>Explore</h4>
+      <ul>
+        <li><a href="#services">Services</a></li><li><a href="#team">Our Team</a></li><li><a href="#gallery">Gallery</a></li>
+        <li><a href="#packages">Packages</a></li><li><a href="#gift">Gift Cards</a></li><li><a href="#booking">Book Online</a></li><li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Visit</h4>
+      <ul>
+        <li>128 Rosewood Avenue, Beverly Hills, CA 90210</li>
+        <li><a href="tel:+18254195570">+1 (825) 419-5570</a></li>
+        <li><a href="mailto:sihaamcabdiraxmaan628@gmail.com" style="word-break:break-all">sihaamcabdiraxmaan628@gmail.com</a></li>
+        <li style="font-size:12px;color:rgba(247,242,234,.4)">Tue–Fri 9–7 · Sat 9–6 · Sun 10–4<br>Closed Mondays</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span>© <span id="year"></span> Aurelia Salon &amp; Spa. All rights reserved.</span>
+    <span><button class="linkish" onclick="openManage()">Manage booking</button> · <a href="#faq">Cancellation policy</a></span>
+  </div>
+</footer>
+
+<button id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑</button>
+<a href="#booking" id="mobileBook">🗓 Book</a>
+<div id="toast" role="status"></div>
+
+<script>
+/* ============================================================
+   AURELIA — application logic (vanilla JavaScript)
+   Data is persisted in localStorage under the "aurelia.*" keys.
+   ============================================================ */
+const SALON = {
+  name: "Aurelia", phone: "+1 (825) 419-5570",
+  email: "sihaamcabdiraxmaan628@gmail.com",
+  address: "128 Rosewood Avenue, Beverly Hills, CA 90210",
+};
+
+/* ── Data ─────────────────────────────────────────── */
+const CATEGORIES = [
+  { id:"hair",   label:"Hair Artistry", blurb:"Cuts, color & styling by master stylists" },
+  { id:"nails",  label:"Nail Studio",   blurb:"Manicures, pedicures & couture nail art" },
+  { id:"skin",   label:"Skin & Spa",    blurb:"Facials and treatments for a natural glow" },
+  { id:"makeup", label:"Makeup",        blurb:"Soft glam to full occasion looks" },
+];
+const SERVICES = [
+  {id:"hair-cut",   cat:"hair",  name:"Signature Cut & Style",     desc:"Bespoke consultation, precision cut and a polished finish tailored to your features.", price:65,  dur:60,  pop:true},
+  {id:"hair-blow",  cat:"hair",  name:"Luxury Blowout",            desc:"A voluminous, glossy blow-dry with heat protection and a silky mirror finish.",        price:45,  dur:45},
+  {id:"hair-bal",   cat:"hair",  name:"Balayage & Gloss",          desc:"Hand-painted dimension sealed with a shine-boosting gloss treatment.",                 price:180, dur:150, pop:true},
+  {id:"hair-col",   cat:"hair",  name:"Full Color Transformation", desc:"Complete single-process color with bond-building care from roots to ends.",            price:150, dur:120},
+  {id:"hair-ker",   cat:"hair",  name:"Keratin Smoothing",         desc:"Frizz-free silkiness for up to four months with our salon-exclusive system.",          price:220, dur:120},
+  {id:"hair-updo",  cat:"hair",  name:"Occasion & Bridal Updo",    desc:"Sculpted updos, waves and braided artistry for weddings and events.",                  price:95,  dur:75},
+  {id:"nail-man",   cat:"nails", name:"Classic Manicure",          desc:"Shaping, cuticle care, a relaxing massage and a flawless polish application.",         price:35,  dur:40},
+  {id:"nail-gel",   cat:"nails", name:"Gel Manicure",              desc:"Chip-free, high-shine gel color cured to last up to three weeks.",                     price:55,  dur:60,  pop:true},
+  {id:"nail-ped",   cat:"nails", name:"Luxury Spa Pedicure",       desc:"Warm soak, exfoliation, callus care and a massage finished with polish.",              price:65,  dur:60},
+  {id:"nail-art",   cat:"nails", name:"Couture Nail Art",          desc:"Hand-painted designs, chrome, French twists and bespoke embellishments.",              price:25,  dur:30},
+  {id:"skin-rad",   cat:"skin",  name:"Radiance Signature Facial", desc:"Deep cleanse, gentle exfoliation, lymphatic massage and a custom mask.",               price:110, dur:60,  pop:true},
+  {id:"skin-deep",  cat:"skin",  name:"Deep Cleansing Facial",     desc:"Targeted purification for congested skin with steam and extractions.",                 price:95,  dur:50},
+  {id:"skin-hyd",   cat:"skin",  name:"HydraGlow Treatment",       desc:"Multi-step hydration infusion for a plump, dewy, camera-ready glow.",                   price:140, dur:75},
+  {id:"skin-mas",   cat:"skin",  name:"Aromatherapy Massage",      desc:"Full-body relaxation with warm oils and calming pressure-point work.",                  price:120, dur:60},
+  {id:"mk-soft",    cat:"makeup",name:"Soft Glam Application",     desc:"Effortless daytime-to-evening artistry with skin-first techniques.",                    price:75,  dur:45},
+  {id:"mk-full",    cat:"makeup",name:"Full Glam & Occasion",      desc:"Sculpted, long-wear artistry for galas, photoshoots and celebrations.",                 price:110, dur:60,  pop:true},
+  {id:"mk-bridal",  cat:"makeup",name:"Bridal Trial Session",      desc:"A relaxed preview of your wedding look with keepsake notes and swatches.",              price:130, dur:75},
+];
+const STYLISTS = [
+  {id:"isabella", name:"Isabella Laurent", title:"Master Stylist · Color Director", color:"#8a6d45", years:12, specialties:["Balayage","Precision cuts","Color correction"], quote:"Great color should look like you were born with it."},
+  {id:"marcus",   name:"Marcus Chen",      title:"Senior Stylist",                  color:"#5c534a", years:8,  specialties:["Modern cuts","Men's grooming","Texture & curls"], quote:"A great haircut should grow out as beautifully as day one."},
+  {id:"sofia",    name:"Sofia Marchetti",  title:"Lead Esthetician",                color:"#7c8878", years:10, specialties:["Signature facials","HydraGlow","Skin consulting"], quote:"Skin health first — the glow always follows."},
+  {id:"ruby",     name:"Ruby Okafor",      title:"Nail Artist · Makeup Pro",        color:"#96543f", years:6,  specialties:["Couture nail art","Soft glam","Bridal makeup"], quote:"The details are where the luxury lives."},
+];
+const PACKAGES = [
+  {name:"The Midweek Reset",  desc:"Luxury blowout, classic manicure and a 30-minute scalp ritual — our most-loved escape.", items:["Luxury Blowout","Classic Manicure","Scalp ritual"], price:125, worth:155},
+  {name:"The Golden Hour",    desc:"Radiance Signature Facial, gel manicure and soft glam makeup for evenings that matter.", items:["Radiance Signature Facial","Gel Manicure","Soft Glam Application"], price:210, worth:240, featured:true},
+  {name:"The Bridal Morning", desc:"Occasion updo, full glam makeup and a calming aromatherapy massage before you walk the aisle.", items:["Occasion & Bridal Updo","Full Glam & Occasion","Aromatherapy Massage"], price:295, worth:325},
+];
+const TESTIMONIALS = [
+  {n:"Charlotte D.", s:"Balayage & Gloss", r:5, t:"Isabella completely transformed my hair. The balayage is the most natural-looking color I've ever had, and three months later it's still growing out beautifully. Worth every penny."},
+  {n:"Priya S.",     s:"Radiance Signature Facial", r:5, t:"Sofia mapped out a whole skin journey for me. After four facials my skin has never looked better — the glow is real and my friends keep asking what I've changed."},
+  {n:"Emma R.",      s:"Full Glam & Occasion", r:5, t:"Ruby did my makeup for my sister's wedding and it survived happy tears, dinner and dancing until 1 AM. The soft glam was elegant, not heavy."},
+  {n:"Daniel K.",    s:"Signature Cut & Style", r:5, t:"Marcus is the first stylist who actually listened, then gave me a cut that works with my cowlicks instead of fighting them. Booking online takes me about thirty seconds."},
+  {n:"Amelia W.",    s:"The Golden Hour package", r:5, t:"Booked the Golden Hour before a gala and the whole afternoon felt like a spa vacation. Facial, nails, makeup — every detail was flawless."},
+  {n:"Grace T.",     s:"Gel Manicure", r:5, t:"The calmest salon I've ever visited. My gel manicure lasted three full weeks, and the little hand massage with warm oil was heaven."},
+];
+const FAQS = [
+  {q:"Do I need an appointment, or do you take walk-ins?", a:"We recommend booking ahead — our stylists' schedules fill quickly, especially weekends. Same-day bookings are often available and walk-ins are always welcome when a stylist is free."},
+  {q:"What is your cancellation policy?", a:"Life happens — we simply ask for 12 hours' notice so we can offer the spot to another guest. You can cancel anytime via “Manage booking” in the footer."},
+  {q:"Which products do you use?", a:"We partner exclusively with salon-grade, cruelty-free lines chosen for performance and gentleness."},
+  {q:"Is parking available nearby?", a:"Yes — complimentary 2-hour parking is available in the Rosewood Avenue garage directly beneath the salon, and we validate tickets at reception."},
+  {q:"Do you offer consultations before big changes?", a:"Absolutely. Complimentary 15-minute consultations are available for color transformations, bridal parties and skincare journeys — book any stylist and mention it in the notes."},
+];
+// Hours by JS weekday (0=Sun). Minutes from midnight. null = closed.
+const OPENING_HOURS = {0:{o:600,c:960},1:null,2:{o:540,c:1140},3:{o:540,c:1140},4:{o:540,c:1140},5:{o:540,c:1140},6:{o:540,c:1080}};
+const HOURS_LABEL = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const HOURS_DATA = [
+  {d:"Monday",h:"Closed",closed:true},{d:"Tuesday",h:"9:00 AM – 7:00 PM"},{d:"Wednesday",h:"9:00 AM – 7:00 PM"},
+  {d:"Thursday",h:"9:00 AM – 7:00 PM"},{d:"Friday",h:"9:00 AM – 7:00 PM"},{d:"Saturday",h:"9:00 AM – 6:00 PM"},{d:"Sunday",h:"10:00 AM – 4:00 PM"},
+];
+const GALLERY = [
+  {l:"Balayage & Blowout", glyph:"✦", c:"#8a6d45"},
+  {l:"Bridal Artistry",    glyph:"❀", c:"#a48d6a"},
+  {l:"Gel Manicure",       glyph:"✋", c:"#b08d57"},
+  {l:"Color Studio",       glyph:"◑", c:"#96723f"},
+  {l:"Soft Glam",          glyph:"◕", c:"#8a7a5c"},
+  {l:"Skin & Spa",         glyph:"✧", c:"#6f5b3e"},
+].map(x => ({l:x.l, glyph:x.glyph, bg:`linear-gradient(150deg, ${x.c}, #3d332c)`}));
+
+/* ── Utilities ────────────────────────────────────── */
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2,"0");
+const toKey = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const fmtDur = m => m < 60 ? `${m} min` : (m % 60 ? `${Math.floor(m/60)} h ${m%60} min` : `${Math.floor(m/60)} h`);
+const fmt12 = t => { let [h,m] = t.split(":").map(Number); const ap = h >= 12 ? "PM" : "AM"; h = h % 12 || 12; return `${h}:${pad(m)} ${ap}`; };
+const fmtDate = k => new Date(k + "T12:00:00").toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric",year:"numeric"});
+function store(key, val){ if (val === undefined) { try { return JSON.parse(localStorage.getItem("aurelia."+key)) || []; } catch { return []; } } localStorage.setItem("aurelia."+key, JSON.stringify(val)); }
+function makeRef(prefix){ const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let s=""; for(let i=0;i<6;i++) s+=c[Math.floor(Math.random()*c.length)]; return prefix+s; }
+let toastTimer;
+function toast(msg, isErr){ const t=$("toast"); t.textContent=msg; t.classList.toggle("err", !!isErr); t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"), 3800); }
+
+/* ── Static sections ──────────────────────────────── */
+$("year").textContent = new Date().getFullYear();
+
+// Services tabs
+let activeCat = "hair";
+function renderTabs(){
+  $("svcTabs").innerHTML = CATEGORIES.map(c=>`<button class="tab ${c.id===activeCat?"active":""}" onclick="setCat('${c.id}')">${c.label}</button>`).join("");
+  $("svcBlurb").textContent = CATEGORIES.find(c=>c.id===activeCat).blurb;
+  $("svcGrid").innerHTML = SERVICES.filter(s=>s.cat===activeCat).map(s=>`
+    <article class="svc">
+      ${s.pop?'<span class="pop">✦ Popular</span>':""}
+      <h3>${s.name}</h3><p>${s.desc}</p>
+      <div class="svc-foot">
+        <div><span class="price">$${s.price}</span>&nbsp; <span class="dur">🕐 ${fmtDur(s.dur)}</span></div>
+        <button class="svc-book" onclick="bookService('${s.id}')">Book →</button>
+      </div>
+    </article>`).join("");
+}
+function setCat(id){ activeCat = id; renderTabs(); }
+renderTabs();
+
+// Team
+$("teamGrid").innerHTML = STYLISTS.map(p=>`
+  <div class="member">
+    <div class="avatar" style="background:${p.color}">${p.name.split(" ").map(w=>w[0]).join("")}</div>
+    <h3>${p.name}</h3><p class="role">${p.title}</p>
+    <p class="quote">“${p.quote}”</p>
+    <span class="yrs">✓ ${p.yrs} yrs experience</span>
+    <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center">
+      ${p.specialties.map(s=>`<span style="font-size:10.5px;border:1px solid var(--border);border-radius:999px;padding:3px 10px;color:rgba(43,36,32,.7)">${s}</span>`).join("")}
+    </div>
+  </div>`).join("");
+
+// Packages
+$("pkgGrid").innerHTML = PACKAGES.map(p=>`
+  <article class="pkg ${p.featured?"featured":""}">
+    ${p.featured?'<span class="tag">Most loved</span>':""}
+    <h3>${p.name}</h3><p>${p.desc}</p>
+    <ul>${p.items.map(i=>`<li>${i}</li>`).join("")}</ul>
+    <div><span class="pval">$${p.price}</span><span class="was">$${p.worth}</span></div>
+    <a class="btn" href="#booking">Book This Package</a>
+  </article>`).join("");
+
+// Gallery
+$("galGrid").innerHTML = GALLERY.map((g,i)=>`
+  <div class="gal-item" style="background:${g.bg}" onclick="openLb(${i})" role="button" aria-label="View ${g.l} larger">
+    <span class="glyph">${g.glyph}</span><span class="gal-label">${g.l}</span>
+  </div>`).join("");
+let lbIdx = 0;
+function openLb(i){ lbIdx=i; renderLb(); $("lightbox").hidden=false; }
+function renderLb(){
+  const g=GALLERY[lbIdx];
+  $("lightbox").innerHTML = `
+    <button id="lbClose" onclick="closeLb()" aria-label="Close">✕</button>
+    <button class="lb-btn" id="lbPrev" onclick="lbMove(-1)" aria-label="Previous">‹</button>
+    <div class="frame" style="background:${g.bg}">${g.glyph}</div>
+    <p class="cap">${g.l} · ${lbIdx+1} / ${GALLERY.length}</p>
+    <button class="lb-btn" id="lbNext" onclick="lbMove(1)" aria-label="Next">›</button>`;
+}
+function lbMove(d){ lbIdx=(lbIdx+d+GALLERY.length)%GALLERY.length; renderLb(); }
+function closeLb(){ $("lightbox").hidden=true; }
+
+// Testimonials
+let tstI = 0;
+function renderTst(){
+  const t=TESTIMONIALS[tstI];
+  $("tstBox").innerHTML = `<blockquote>
+    <div class="qmark">”</div>
+    <div class="stars" style="margin-top:12px">${"★".repeat(t.r)}</div>
+    <p>“${t.t}”</p>
+    <p class="who">${t.n}</p><p class="svc">${t.s}</p>
+  </blockquote>`;
+  $("tstDots").innerHTML = TESTIMONIALS.map((_,i)=>`<button class="dot ${i===tstI?"active":""}" onclick="tstSet(${i})" aria-label="Review ${i+1}"></button>`).join("");
+}
+function tstMove(d){ tstI=(tstI+d+TESTIMONIALS.length)%TESTIMONIALS.length; renderTst(); }
+function tstSet(i){ tstI=i; renderTst(); }
+renderTst();
+setInterval(()=>tstMove(1), 8000);
+
+// FAQ
+$("faqBox").innerHTML = FAQS.map((f,i)=>`
+  <div class="faq-item" id="faq${i}">
+    <button class="faq-q" onclick="toggleFaq(${i})">${f.q}</button>
+    <div class="faq-a"><p>${f.a}</p></div>
+  </div>`).join("");
+function toggleFaq(i){ $("faq"+i).classList.toggle("open"); }
+
+// Hours + today badge
+const tIdx = (new Date().getDay()+6)%7;
+$("hoursList").innerHTML = HOURS_DATA.map((r,i)=>`
+  <div class="row ${i===tIdx?"today":""}"><dt>${r.d}${i===tIdx?'<span class="badge-today">Today</span>':""}</dt><dd style="color:${r.closed?"var(--muted)":"inherit"}">${r.h}</dd></div>`).join("");
+$("todayBadge").textContent = HOURS_DATA[tIdx].closed ? "· Closed today" : `· Open today ${HOURS_DATA[tIdx].h.split("–")[1] ? "until "+HOURS_DATA[tIdx].h.split("–")[1].trim() : ""}`;
+
+// Open-now pill
+function renderPill(){
+  const now=new Date(), d=now.getDay(), mins=now.getHours()*60+now.getMinutes();
+  const td=OPENING_HOURS[d]; const pill=$("openPill");
+  if (td && mins>=td.o && mins<td.c){ pill.className="pill open"; pill.textContent="● Open now · until "+fmt12(pad(Math.floor(td.c/60))+":"+pad(td.c%60)); return; }
+  for(let i=0;i<8;i++){ const dd=(d+i)%7, h=OPENING_HOURS[dd]; if(!h) continue;
+    const open=fmt12(pad(Math.floor(h.o/60))+":"+pad(h.o%60));
+    if(i===0 && mins<h.o){ pill.className="pill closed"; pill.textContent="● Closed · opens "+open+" today"; return; }
+    if(i>0){ const nm=new Date(now.getFullYear(),now.getMonth(),now.getDate()+i).toLocaleDateString("en-US",{weekday:"long"});
+      pill.className="pill closed"; pill.textContent="● Closed · opens "+nm+" "+open; return; } }
+}
+renderPill(); setInterval(renderPill,60000);
+
+// Back to top
+window.addEventListener("scroll",()=>{ $("toTop").classList.toggle("show", window.scrollY>700); },{passive:true});
+
+/* ── Booking wizard ───────────────────────────────── */
+const wiz = { step:1, cat:"hair", svc:null, sty:"any", date:null, time:null, month:null };
+function initials(n){ return n.split(" ").map(w=>w[0]).join(""); }
+
+function bookService(id){
+  const s=SERVICES.find(x=>x.id===id);
+  if(s){ wiz.svc=s.id; wiz.cat=s.cat; if(wiz.step===1) wiz.step=2; renderWizard(); }
+  document.getElementById("booking").scrollIntoView({behavior:"smooth"});
+}
+
+function bookedFor(dateKey){ return store("bookings").filter(b=>b.date===dateKey && b.status==="confirmed"); }
+function slotTakenFor(stylistId, dateKey, start, dur){
+  return bookedFor(dateKey).some(b=>{
+    if(b.stylistId!==stylistId) return false;
+    const [bh,bm]=b.time.split(":").map(Number); const bs=bh*60+bm;
+    return start < bs + b.dur && bs < start + dur;
+  });
+}
+function slotsFor(dateKey){
+  const d = new Date(dateKey+"T12:00:00"); const h=OPENING_HOURS[d.getDay()];
+  if(!h) return {closed:true,slots:[]};
+  const svc=SERVICES.find(s=>s.id===wiz.svc); if(!svc) return {closed:false,slots:[]};
+  const now=new Date(); const isToday=toKey(now)===dateKey;
+  const nowMins=now.getHours()*60+now.getMinutes(); const earliest=isToday?nowMins+45:0;
+  const out=[];
+  for(let t=h.o; t+svc.dur<=h.c; t+=30){
+    let ok;
+    if(wiz.sty==="any"){ ok = STYLISTS.some(st=>!slotTakenFor(st.id,dateKey,t,svc.dur)); }
+    else ok = !slotTakenFor(wiz.sty,dateKey,t,svc.dur);
+    if(t<earliest) ok=false;
+    out.push({time:pad(Math.floor(t/60))+":"+pad(t%60), ok});
+  }
+  return {closed:false, slots:out};
+}
+
+const STEP_DEFS=[{n:1,l:"Service"},{n:2,l:"Stylist"},{n:3,l:"Date & Time"},{n:4,l:"Details"}];
+function renderWizard(){
+  if(wiz.step===5){ renderConfirm(); return; }
+  $("stepBar").innerHTML = STEP_DEFS.map(s=>`
+    <button class="step ${wiz.step===s.n?"current":wiz.step>s.n?"done":""}" ${s.n>=wiz.step?"disabled":""} onclick="wiz.step=${s.n};renderWizard()">
+      <span class="n">${wiz.step>s.n?"✓":s.n}</span>${s.l}
+    </button>`).join("");
+
+  const m=$("wizMain");
+  if(wiz.step===1){
+    m.innerHTML = `<h3>What are we doing today?</h3>
+      <div class="chiprow">${CATEGORIES.map(c=>`<button class="chip ${c.id===wiz.cat?"active":""}" onclick="wiz.cat='${c.id}';renderWizard()">${c.label}</button>`).join("")}</div>
+      <div class="picklist">${SERVICES.filter(s=>s.cat===wiz.cat).map(s=>`
+        <button class="pick ${wiz.svc===s.id?"sel":""}" onclick="wiz.svc='${s.id}';renderWizard()">
+          <span class="t">${s.name}<b>$${s.price}</b></span><span class="d">🕐 ${fmtDur(s.dur)}</span>
+        </button>`).join("")}</div>`;
+  } else if(wiz.step===2){
+    m.innerHTML = `<h3>Who would you like to see?</h3>
+      <p class="wiz-hint">Every stylist can perform every service — pick a favourite or let us assign the first available.</p>
+      <div class="picklist">
+        <button class="pick ${wiz.sty==="any"?"sel":""}" onclick="wiz.sty='any';renderWizard()">
+          <span class="person"><span class="pa" style="background:var(--gold)">✦</span><span><span class="t" style="display:block;font-weight:500;font-size:14px">No preference</span><span class="d" style="font-size:12px;color:rgba(247,242,234,.55)">Fastest availability — we'll match you</span></span></span>
+        </button>
+        ${STYLISTS.map(p=>`
+        <button class="pick ${wiz.sty===p.id?"sel":""}" onclick="wiz.sty='${p.id}';renderWizard()">
+          <span class="person"><span class="pa" style="background:${p.color}">${initials(p.name)}</span>
+          <span><span class="t" style="display:block;font-weight:500;font-size:14px">${p.name}</span><span class="d" style="font-size:12px;color:rgba(247,242,234,.55)">${p.title}</span></span></span>
+        </button>`).join("")}
+      </div>`;
+  } else if(wiz.step===3){
+    if(!wiz.month){ wiz.month = wiz.date ? new Date(wiz.date+"T12:00:00") : new Date(); }
+    const m2=wiz.month, y=m2.getFullYear(), mo=m2.getMonth();
+    const first=new Date(y,mo,1), start=(first.getDay()+6)%7; // Monday-first grid
+    const days=new Date(y,mo+1,0).getDate();
+    const today=new Date(); today.setHours(0,0,0,0);
+    const max=new Date(today); max.setDate(max.getDate()+60);
+    let cells="";
+    for(let i=0;i<start;i++) cells+="<span></span>";
+    for(let d=1;d<=days;d++){
+      const dd=new Date(y,mo,d); const key=toKey(dd);
+      const dis = dd<today || dd>max || dd.getDay()===1;
+      cells+=`<button class="day ${wiz.date===key?"sel":""} ${toKey(today)===key?"today":""}" ${dis?"disabled":""} onclick="pickDate('${key}')">${d}</button>`;
+    }
+    let slotsHtml="";
+    if(wiz.date){
+      const r=slotsFor(wiz.date);
+      slotsHtml = r.closed
+        ? `<p style="margin-top:16px;font-size:13px;color:rgba(247,242,234,.5)">We're closed on this day — please pick another date.</p>`
+        : `<p style="margin-top:22px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-light)">Available times</p>
+           <div class="times">${r.slots.map(s=>`<button class="slot ${wiz.time===s.time?"sel":""}" ${s.ok?"":"disabled"} onclick="wiz.time='${s.time}';renderWizard()">${fmt12(s.time)}</button>`).join("")}</div>`;
+    } else {
+      slotsHtml = `<div style="border:1px dashed rgba(255,255,255,.15);margin-top:18px;padding:40px 20px;text-align:center;font-size:13px;color:rgba(247,242,234,.5)">Choose a date to see available times →</div>`;
+    }
+    m.innerHTML = `<h3>Pick a date &amp; time</h3>
+      <p class="wiz-hint">We're closed on Mondays. Bookings up to 60 days ahead.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:8px">
+        <div>
+          <div class="cal-head">
+            <button onclick="shiftMonth(-1)" aria-label="Previous month">‹</button>
+            <span class="mon">${m2.toLocaleDateString("en-US",{month:"long",year:"numeric"})}</span>
+            <button onclick="shiftMonth(1)" aria-label="Next month">›</button>
+          </div>
+          <div class="cal">${["Mo","Tu","We","Th","Fr","Sa","Su"].map(d=>`<span class="dow">${d}</span>`).join("")}${cells}</div>
+        </div>
+        <div>${slotsHtml}</div>
+      </div>`;
+  } else if(wiz.step===4){
+    m.innerHTML = `<h3>Almost done — your details</h3>
+      <form class="wiz-form" onsubmit="submitBooking(event)">
+        <div><label for="bkName">Full name *</label><input id="bkName" autocomplete="name" placeholder="e.g. Amelia Watson"><p class="err hidden" id="eName"></p></div>
+        <div class="two">
+          <div><label for="bkEmail">Email *</label><input id="bkEmail" type="email" autocomplete="email" placeholder="you@example.com"><p class="err hidden" id="eEmail"></p></div>
+          <div><label for="bkPhone">Phone *</label><input id="bkPhone" type="tel" autocomplete="tel" placeholder="+1 (555) 000-0000"><p class="err hidden" id="ePhone"></p></div>
+        </div>
+        <div><label for="bkNotes">Notes for your stylist (optional)</label><textarea id="bkNotes" rows="3" placeholder="Allergies, inspiration, occasion…"></textarea></div>
+      </form>`;
+  }
+
+  // summary
+  const svc=SERVICES.find(s=>s.id===wiz.svc);
+  $("sumSvc").innerHTML = svc ? `${svc.name}<br><span style="font-size:12px;color:var(--gold-light)">$${svc.price} · ${fmtDur(svc.dur)}</span>` : "Not selected";
+  $("sumSvc").style.color = svc ? "var(--cream)" : "rgba(247,242,234,.4)";
+  $("sumSty").textContent = wiz.sty==="any" ? "No preference" : STYLISTS.find(p=>p.id===wiz.sty).name;
+  $("sumWhen").innerHTML = wiz.date && wiz.time ? `${fmtDate(wiz.date)}<br><span style="font-size:12px;color:var(--gold-light)">${fmt12(wiz.time)}</span>` : "Not selected";
+  $("sumWhen").style.color = wiz.date && wiz.time ? "var(--cream)" : "rgba(247,242,234,.4)";
+
+  // nav buttons
+  const nav=$("wizNav");
+  const canNext = wiz.step===1 ? wiz.svc : wiz.step===3 ? (wiz.date&&wiz.time) : true;
+  nav.innerHTML = `
+    ${wiz.step>1?`<button class="wiz-back" onclick="wiz.step--;wiz.time=null;renderWizard()">← Back</button>`:"<span></span>"}
+    ${wiz.step<4
+      ? `<button class="btn" ${canNext?"":"disabled style='opacity:.4;cursor:not-allowed'"} onclick="nextStep()">Continue →</button>`
+      : `<button class="btn" onclick="submitBooking(event)">✓ Confirm Booking</button>`}`;
+}
+function nextStep(){ if(canProceed()) { wiz.step++; if(wiz.step===3) wiz.time=null; renderWizard(); } }
+function canProceed(){ return wiz.step===1 ? !!wiz.svc : wiz.step===3 ? !!(wiz.date&&wiz.time) : true; }
+function pickDate(k){ wiz.date=k; wiz.time=null; renderWizard(); }
+function shiftMonth(d){ const m=wiz.month; wiz.month=new Date(m.getFullYear(), m.getMonth()+d, 1); renderWizard(); }
+
+function submitBooking(e){
+  e && e.preventDefault();
+  const name=$("bkName").value.trim(), email=$("bkEmail").value.trim(), phone=$("bkPhone").value.trim(), notes=$("bkNotes").value.trim();
+  let ok=true;
+  const setErr=(id,msg)=>{ const el=$(id); if(msg){el.textContent=msg;el.classList.remove("hidden");ok=false;} else el.classList.add("hidden"); };
+  setErr("eName",  name.length<2 ? "Please enter your full name" : "");
+  setErr("eEmail", !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) ? "Please enter a valid email" : "");
+  setErr("ePhone", phone.replace(/\D/g,"").length<7 ? "Please enter a valid phone number" : "");
+  if(!ok) return;
+
+  const svc=SERVICES.find(s=>s.id===wiz.svc);
+  const stylistId = wiz.sty==="any" ? STYLISTS.find(p=>!slotTakenFor(p.id,wiz.date,+(wiz.time.split(":")[0])*60+ +wiz.time.split(":")[1], svc.dur)).id : wiz.sty;
+  const stylist=STYLISTS.find(p=>p.id===stylistId);
+  const ref=makeRef("AUR-");
+  const booking={reference:ref, serviceId:svc.id, serviceName:svc.name, price:svc.price, dur:svc.dur,
+    stylistId:stylist.id, stylistName:stylist.name, date:wiz.date, time:wiz.time,
+    name, email:email.toLowerCase(), phone, notes, status:"confirmed", createdAt:new Date().toISOString()};
+  store("bookings", [...store("bookings"), booking]);
+  wiz.result=booking; wiz.step=5; renderWizard();
+  toast("Booking confirmed — reference "+ref);
+  document.getElementById("booking").scrollIntoView({behavior:"smooth"});
+}
+function renderConfirm(){
+  const b=wiz.result;
+  $("stepBar").innerHTML="";
+  $("wizContent").innerHTML = `<div class="confirm">
+    <div class="ok">✓</div>
+    <h3>You're booked!</h3>
+    <p style="color:rgba(247,242,234,.65);font-size:14px;margin-top:10px">A confirmation has been saved with your reference. We can't wait to welcome you.</p>
+    <p style="font-size:10.5px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold-light);margin-top:26px">Booking reference</p>
+    <p class="ref">${b.reference}</p>
+    <dl style="list-style:none">
+      <div class="row"><dt>Service</dt><dd>${b.serviceName}</dd></div>
+      <div class="row"><dt>Stylist</dt><dd>${b.stylistName}</dd></div>
+      <div class="row"><dt>When</dt><dd>${fmtDate(b.date)} · ${fmt12(b.time)}</dd></div>
+      <div class="row"><dt>Price</dt><dd style="color:var(--gold-light)">$${b.price} · ${fmtDur(b.dur)}</dd></div>
+    </dl>
+    <div style="margin-top:30px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <button class="btn ghost" onclick="resetWizard()">Book another appointment</button>
+      <a class="btn" href="#contact">Directions &amp; contact</a>
+    </div>
+    <p style="margin-top:26px;font-size:12px;color:rgba(247,242,234,.5)">Need to make a change? Use “Manage booking” in the footer or call ${SALON.phone}.</p>
+  </div>`;
+}
+function resetWizard(){ Object.assign(wiz,{step:1,svc:null,sty:"any",date:null,time:null,result:null}); renderWizard(); }
+renderWizard();
+
+/* ── Manage booking ───────────────────────────────── */
+function openManage(){
+  const ref=prompt("Enter your booking reference (e.g. AUR-XXXXXX):");
+  if(!ref) return;
+  const email=prompt("Enter the email you booked with:");
+  if(!email) return;
+  const b=store("bookings").find(x=>x.reference===ref.trim().toUpperCase() && x.email===email.trim().toLowerCase());
+  if(!b){ toast("No booking found for that reference and email combination.", true); return; }
+  const msg = b.status==="cancelled"
+    ? `Booking ${b.reference} was already cancelled.`
+    : `${b.serviceName} with ${b.stylistName}\n${fmtDate(b.date)} at ${fmt12(b.time)}\n$${b.price} · ${fmtDur(b.dur)}\n\nCancel this appointment? (OK = cancel, Cancel = keep)`;
+  if(b.status!=="cancelled"){
+    const [h,m]=b.date.split("-").map(Number); const [hh,mm]=b.time.split(":").map(Number);
+    const startsAt=new Date(h,m-1,dd0(hh),mm); void 0;
+    const hoursUntil=(startsAt.getTime()-Date.now())/36e5;
+    if(hoursUntil<12){ toast("Online cancellation is unavailable within 12 hours of the appointment — please call "+SALON.phone, true); return; }
+    if(confirm(msg)){
+      b.status="cancelled";
+      store("bookings", store("bookings").map(x=>x.reference===b.reference?b:x));
+      toast("Booking "+b.reference+" cancelled. We hope to see you another time!");
+    } else toast("Your booking stays confirmed. See you soon!");
+  } else toast(msg, true);
+}
+function dd0(n){ return n; }
+
+/* ── Gift cards ───────────────────────────────────── */
+let gcAmt = 100;
+function syncGc(){
+  const custom=$("gcCustom").value;
+  gcAmt = custom ? (Number(custom)||0) : gcAmt;
+  $("gcAmt").textContent = "$"+gcAmt;
+  $("gcCardAmt").textContent = "$"+gcAmt;
+}
+document.querySelectorAll(".amt-btn").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll(".amt-btn").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active"); $("gcCustom").value=""; gcAmt=Number(b.dataset.amt); syncGc();
+}));
+$("gcCustom").addEventListener("input", syncGc);
+$("gcBuy").addEventListener("click",()=>{
+  const name=$("gcName").value.trim(), email=$("gcEmail").value.trim(), err=$("gcErr");
+  let msg="";
+  if(name.length<2) msg="Please enter your name";
+  else if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) msg="Please enter a valid email";
+  else if(!gcAmt || gcAmt<25 || gcAmt>1000) msg="Amount must be between $25 and $1,000";
+  if(msg){ err.textContent=msg; err.classList.remove("hidden"); return; }
+  err.classList.add("hidden");
+  const code=makeRef("AUR-G-");
+  store("giftcards", [...store("giftcards"), {code, amount:gcAmt, name, email:email.toLowerCase(), status:"active", createdAt:new Date().toISOString()}]);
+  $("gcVisual").innerHTML = `<div class="gc-success">
+    <div style="font-size:34px">✓</div>
+    <p style="font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold-light);margin-top:14px">Gift card issued</p>
+    <p class="serif" style="font-size:40px;color:var(--cream);margin-top:6px">$${gcAmt}</p>
+    <p class="code" id="issuedCode">${code}</p><br>
+    <button class="btn ghost" style="margin-top:16px" onclick="copyIssued()">⧉ Copy code</button>
+  </div>`;
+  toast("Gift card of $"+gcAmt+" created!");
+});
+function copyIssued(){
+  const code=$("issuedCode").textContent;
+  if(navigator.clipboard){ navigator.clipboard.writeText(code).then(()=>toast("Gift card code copied")); }
+  else toast("Your code: "+code);
+}
+
+/* ── Contact form ─────────────────────────────────── */
+$("cfSend").addEventListener("click",()=>{
+  const name=$("cfName").value.trim(), email=$("cfEmail").value.trim(), subject=$("cfSubject").value.trim(), message=$("cfMsg").value.trim();
+  const err=$("cfErr"); let msg="";
+  if(name.length<2) msg="Please enter your name";
+  else if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) msg="Please enter a valid email";
+  else if(message.length<10) msg="Message should be at least 10 characters";
+  if(msg){ err.textContent=msg; err.classList.remove("hidden"); return; }
+  err.classList.add("hidden");
+  store("messages", [...store("messages"), {name,email:email.toLowerCase(),subject,message,createdAt:new Date().toISOString()}]);
+  $("cfName").value=$("cfEmail").value=$("cfSubject").value=$("cfMsg").value="";
+  toast("Message sent — we'll reply within one business hour!");
+});
+
+/* ── Newsletter ───────────────────────────────────── */
+function subscribeNl(){
+  const email=$("nlEmail").value.trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ toast("Please enter a valid email", true); return; }
+  const list=store("subscribers");
+  if(list.some(x=>x.email===email.toLowerCase())){ toast("You're already on the list!"); return; }
+  list.push({email:email.toLowerCase(), createdAt:new Date().toISOString()});
+  store("subscribers", list);
+  $("nlEmail").value="";
+  toast("Welcome to the list — offers and openings, straight to your inbox.");
+}
+$("nlBtn").addEventListener("click", subscribeNl);
+$("nlEmail").addEventListener("keydown", e=>{ if(e.key==="Enter") subscribeNl(); });
+</script>
+</body>
+</html>
